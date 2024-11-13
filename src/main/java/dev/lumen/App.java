@@ -1,9 +1,9 @@
 package dev.lumen;
 
 import dev.lumen.app.RootLoader;
-import dev.sol.core.app.FXApplication;
-import dev.sol.core.app.view.FXLoader;
-import dev.sol.core.base.scene.FXSkin;
+import dev.sol.core.application.FXApplication;
+import dev.sol.core.application.loader.FXLoaderFactory;
+import dev.sol.core.scene.FXSkin;
 
 public class App extends FXApplication {
 
@@ -11,12 +11,13 @@ public class App extends FXApplication {
     public void initialize() throws Exception {
 
         setTitle("EmployeeFX JBC");
-        setSkin(FXSkin.NORD_DARK);
+        setSkin(FXSkin.PRIMER_LIGHT);
+        applicationStage.setResizable(false);
         _initialize_application();
     }
 
     private void _initialize_application() {
-        RootLoader rootLoader = (RootLoader) FXLoader
+        RootLoader rootLoader = (RootLoader) FXLoaderFactory
                 .createInstance(RootLoader.class, App.class.getResource("/dev/lumen/app/ROOT.fxml"))
                 .addParameter("scene", applicationScene).initialize();
         rootLoader.load();
