@@ -1,23 +1,18 @@
 package dev.lumen.app;
 
-
+import dev.lumen.App;
 import dev.sol.core.application.loader.FXLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 
-public class RootLoader extends FXLoader{
-    
+public class RootLoader extends FXLoader {
     @Override
     public void load() {
         Scene scene = (Scene) params.get("scene");
+        scene.setRoot(root);
 
-        try {
-            Parent root = loader.load();
-            scene.setRoot(root);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        RootController controller = loader.getController();
+        App.CONTROLLER_REGISTRY.register("ROOT", controller);
+        controller.load();
 
     }
 
