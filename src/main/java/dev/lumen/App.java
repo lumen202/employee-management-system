@@ -47,8 +47,4 @@ public class App extends FXApplication {
         rootLoader.load();
     }
 
-    public static void main(String[] args) {
-        launch();
-    }
-
 }
