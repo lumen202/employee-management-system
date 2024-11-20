@@ -1,8 +1,13 @@
 package dev.lumen.app;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
+import atlantafx.base.theme.Styles;
+import atlantafx.base.util.Animations;
 import dev.lumen.App;
-
+import dev.lumen.data.EmployeeDAO;
 import dev.lumen.models.Department;
 import dev.lumen.models.Employee;
 import dev.lumen.models.Job;
@@ -48,10 +53,39 @@ public class RootController extends FXController {
     @FXML
     ComboBox<Employee> newManagerField;
 
+    @FXML
+    private void handleAddEmployee() {
+        if (nameField.getText().isEmpty()) {
+            nameField.pseudoClassStateChanged(Styles.STATE_DANGER, true);
+            Animations.flash(nameField).playFromStart();
+            return;
+        }
+        Collections.sort(employee_masterList, Comparator.comparing(Employee::getEmp_id));
+        int id_int = Integer.parseInt(employee_masterList.getLast().getEmp_id()) + 1;
+        String emp_id = Integer.toString(id_int);
+        Employee employee = new Employee(emp_id, nameField.getText(), jobField.getValue(), managerField.getValue(),
+                departmentField.getValue());
+        EmployeeDAO.insert(employee);
+        employee_masterList.add(employee);
+        reset_newEmployeeField();
+    }
+
+    @FXML
+    private void handleSearchEmployee() {
+        if (filteredEmployeeField.getText().isEmpty()) {
+            filteredEmployeeField.pseudoClassStateChanged(Styles.STATE_DANGER, true);
+            Animations.flash(filteredEmployeeField).playFromStart();
+            return;
+        }
+    }
+
+    @FXML
+    private void handleSearchAllEmployee() {
+    }
+
     private ObservableList<Department> department_masterList;
     private ObservableList<Employee> employee_masterList;
     private FilteredList<Employee> managerList;
-
 
     private static class MANAGER_CELL extends ListCell<Employee> {
 
@@ -65,7 +99,7 @@ public class RootController extends FXController {
                 return;
             }
             setGraphic(new Label(item.getName()));
-        };
+        }
 
     }
 
@@ -131,10 +165,27 @@ public class RootController extends FXController {
 
     @Override
     protected void load_listeners() {
+        reset_newEmployeeField();
+
         managerField.getSelectionModel().selectFirst();
         jobField.getSelectionModel().selectFirst();
         departmentField.getSelectionModel().selectFirst();
-
         newManagerField.getSelectionModel().selectFirst();
+
+        nameField.textProperty().addListener((o, ov, nv) -> {
+            nameField.pseudoClassStateChanged(Styles.STATE_DANGER, false);
+        });
+        filteredEmployeeField.textProperty().addListener((o, ov, nv) -> {
+            filteredEmployeeField.pseudoClassStateChanged(Styles.STATE_DANGER, false);
+        });
+
+    }
+
+    private void reset_newEmployeeField() {
+        nameField.setText("");
+        jobField.getSelectionModel().selectFirst();
+        managerField.getSelectionModel().selectFirst();
+        departmentField.getSelectionModel().selectFirst();
+
     }
 }

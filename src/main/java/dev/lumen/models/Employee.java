@@ -3,7 +3,7 @@ package dev.lumen.models;
 import java.time.LocalDate;
 
 import dev.sol.core.application.FXModel;
-import dev.sol.core.properties.beans.FXDoubleProperty;
+import dev.sol.core.properties.beans.FXLongProperty;
 import dev.sol.core.properties.beans.FXObjectProperty;
 import dev.sol.core.properties.beans.FXStringProperty;
 import javafx.scene.control.Label;
@@ -11,7 +11,7 @@ import javafx.scene.control.TableCell;
 
 public class Employee extends FXModel {
 
-        public static class DEPARTMENT_TABLECELL extends TableCell<Employee, Department> {
+    public static class DEPARTMENT_TABLECELL extends TableCell<Employee, Department> {
         @Override
         protected void updateItem(Department item, boolean empty) {
             super.updateItem(item, empty);
@@ -26,22 +26,25 @@ public class Employee extends FXModel {
 
     }
 
-
     private FXStringProperty emp_id;
     private FXStringProperty name;
     private FXObjectProperty<Job> job;
     private FXObjectProperty<Employee> manager;
     private FXObjectProperty<LocalDate> hire_date;
-    private FXDoubleProperty salary;
-    private FXDoubleProperty commission;
+    private FXLongProperty salary;
+    private FXLongProperty commission;
     private FXObjectProperty<Department> department;
 
-    public Employee(String emp_id){
-        this(emp_id,null,null,null,null,0,0,null);
+    public Employee(String emp_id) {
+        this(emp_id, null, null, null, null, 0, 0, null);
     }
 
-    public Employee(String emp_id, String name, Job job, Employee manager, LocalDate hire_date, double salary,
-            double commission,
+    public Employee(String emp_id, String name, Job job, Employee manager, Department department) {
+        this(emp_id, name, job, manager, LocalDate.now(), 0, 0, department);
+    }
+
+    public Employee(String emp_id, String name, Job job, Employee manager, LocalDate hire_date, long salary,
+            long commission,
             Department department) {
 
         this.emp_id = new FXStringProperty(emp_id);
@@ -49,8 +52,8 @@ public class Employee extends FXModel {
         this.job = new FXObjectProperty<>(job);
         this.manager = new FXObjectProperty<>(manager);
         this.hire_date = new FXObjectProperty<>(hire_date);
-        this.salary = new FXDoubleProperty(salary);
-        this.commission = new FXDoubleProperty(commission);
+        this.salary = new FXLongProperty(salary);
+        this.commission = new FXLongProperty(commission);
         this.department = new FXObjectProperty<>(department);
 
         track_properties(this.emp_id, this.name, this.job, this.manager, this.hire_date, this.salary, this.commission,
@@ -118,27 +121,27 @@ public class Employee extends FXModel {
         hire_dateProperty().set(hire_date);
     }
 
-    public FXDoubleProperty salaryProperty() {
+    public FXLongProperty salaryProperty() {
         return this.salary;
     }
 
-    public double getSalary() {
+    public long getSalary() {
         return salaryProperty().get();
     }
 
-    public void setSalary(double salary) {
+    public void setSalary(long salary) {
         salaryProperty().set(salary);
     }
 
-    public FXDoubleProperty commissionProperty() {
+    public FXLongProperty commissionProperty() {
         return this.commission;
     }
 
-    public double getCommision() {
+    public long getCommision() {
         return commissionProperty().get();
     }
 
-    public void setCommision(double commision) {
+    public void setCommision(long commision) {
         commissionProperty().set(commision);
     }
 
@@ -156,7 +159,8 @@ public class Employee extends FXModel {
 
     @Override
     public FXModel clone() {
-        Employee employee = new Employee(getEmp_id(), getName(), getJob(),getManager(), getHireDate(), getSalary(), getCommision(),
+        Employee employee = new Employee(getEmp_id(), getName(), getJob(), getManager(), getHireDate(), getSalary(),
+                getCommision(),
                 getDepartment());
         if (getManager() != null)
             employee.setManager(getManager());

@@ -1,6 +1,7 @@
 package dev.lumen.data;
 
 import java.sql.SQLException;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import dev.lumen.App;
 import dev.lumen.models.Department;
 import dev.lumen.models.Employee;
 import dev.lumen.models.Job;
+import dev.sol.db.DBParam;
 import dev.sol.db.DBService;
 import dev.sol.util.CoreDateUtils;
 import javafx.collections.ObservableList;
@@ -29,8 +31,8 @@ public class EmployeeDAO {
             Employee manager = new Employee(crs.getString("manager_id"));
             LocalDate hireDate = CoreDateUtils.parse(
                     crs.getString("hire_date"), "yyyy-MM-dd");
-            double salary = crs.getDouble("salary");
-            double commission = crs.getDouble("commission");
+            long salary = crs.getLong("salary");
+            long commission = crs.getLong("commission");
             Department department = departmentlist.stream()
                     .filter(dept -> {
                         try {
@@ -46,6 +48,21 @@ public class EmployeeDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static DBParam[] paramList(Employee employee) {
+        List<DBParam> paramList = new LinkedList<>();
+        paramList.add(new DBParam(Types.VARCHAR, "emp_id", employee.getEmp_id()));
+        paramList.add(new DBParam(Types.VARCHAR, "emp_name", employee.getName()));
+        paramList.add(new DBParam(Types.VARCHAR, "job_name", employee.getJob()));
+        paramList.add(new DBParam(Types.VARCHAR, "manager_id", employee.getManager().getEmp_id()));
+        paramList.add(
+                new DBParam(Types.VARCHAR, "hire_date", CoreDateUtils.format(employee.getHireDate(), "yyyy-MM-dd")));
+        paramList.add(new DBParam(Types.BIGINT, "salary", employee.getSalary()));
+        paramList.add(new DBParam(Types.BIGINT, "commission", employee.getCommision()));
+        paramList.add(new DBParam(Types.VARCHAR, "dep_id", employee.getDepartment().getDepID()));
+        return paramList.toArray(new DBParam[0]);
+
     }
 
     public static List<Employee> getEmployeeList() {
@@ -73,5 +90,11 @@ public class EmployeeDAO {
         });
 
         return list;
+    }
+
+    public static void insert(Employee employee) {
+
+        DB.insert(TABLE, paramList(employee));
+
     }
 }

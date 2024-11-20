@@ -15,6 +15,7 @@ module lumen.employeeJDBC {
     requires transitive core.db;
     requires core.util;
     requires java.sql.rowset;
+    
 
 
     opens dev.lumen to javafx.fxml;
