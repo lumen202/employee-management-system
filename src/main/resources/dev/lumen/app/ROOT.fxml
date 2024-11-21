@@ -68,8 +68,8 @@
                <children>
                   <GridPane hgap="10.0" prefHeight="176.0" prefWidth="665.0" VBox.vgrow="ALWAYS">
                     <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="149.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="316.0" minWidth="10.0" prefWidth="240.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="151.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="316.0" minWidth="10.0" prefWidth="238.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="340.0" minWidth="10.0" prefWidth="239.0" />
                     </columnConstraints>
                     <rowConstraints>
@@ -80,8 +80,8 @@
                      <children>
                         <Label text="Employee ID" />
                         <Label text="New Manager" GridPane.columnIndex="1" />
-                        <TextField fx:id="filteredEmployeeField" prefHeight="36.0" prefWidth="156.0" promptText="Search Employee ID" GridPane.rowIndex="1" />
-                        <ComboBox fx:id="newManagerField" prefHeight="36.0" prefWidth="159.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="filteredEmployeeField" prefHeight="36.0" prefWidth="149.0" promptText="Search Employee ID" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="newManagerField" prefHeight="36.0" prefWidth="183.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Button mnemonicParsing="false" onAction="#handleSearchEmployee" prefHeight="36.0" prefWidth="120.0" text="Search" GridPane.rowIndex="2">
                            <graphic>
                               <FontIcon iconLiteral="mdi2a-account-search" iconSize="20" />
@@ -89,19 +89,19 @@
                         </Button>
                         <HBox prefHeight="36.0" prefWidth="218.0" spacing="25.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <children>
-                              <Button mnemonicParsing="false" prefHeight="36.0" prefWidth="104.0" text="Update">
+                              <Button mnemonicParsing="false" onAction="#handleUpdate" prefHeight="36.0" prefWidth="104.0" text="Update">
                                  <graphic>
                                     <FontIcon iconLiteral="mdi2r-reload" iconSize="20" />
                                  </graphic>
                               </Button>
-                              <Button mnemonicParsing="false" prefHeight="36.0" prefWidth="105.0" text="Delete">
+                              <Button mnemonicParsing="false" onAction="#handleDelete" prefHeight="36.0" prefWidth="105.0" text="Delete">
                                  <graphic>
                                     <FontIcon iconLiteral="mdi2d-delete" iconSize="20" />
                                  </graphic>
                               </Button>
                            </children>
                         </HBox>
-                        <Button mnemonicParsing="false" prefHeight="36.0" prefWidth="185.0" text="Search All Employees" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                        <Button mnemonicParsing="false" onAction="#handleSearchAllEmployee" prefHeight="36.0" prefWidth="185.0" text="Search All Employees" GridPane.columnIndex="2" GridPane.rowIndex="2">
                            <graphic>
                               <FontIcon iconLiteral="mdi2b-book-search" iconSize="20" />
                            </graphic>

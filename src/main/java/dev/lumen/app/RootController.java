@@ -16,6 +16,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -23,6 +25,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.skin.LabelSkin;
 
 public class RootController extends FXController {
 
@@ -53,6 +57,68 @@ public class RootController extends FXController {
     @FXML
     ComboBox<Employee> newManagerField;
 
+    private ObservableList<Department> department_masterList;
+    private ObservableList<Employee> employee_masterList;
+    private FilteredList<Employee> managerList;
+    private FilteredList<Employee> employeeFilteredList;
+
+    @FXML
+    private void handleDelete() {
+        Employee selectedEmployee = employeeTable.getSelectionModel().getSelectedItem();
+        if (selectedEmployee == null) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Employee Delete Error");
+            alert.setHeaderText("Null selection Error!");
+            alert.setContentText("No employee selceted from the table. Must select an employee to delete");
+            alert.initOwner(scene.getWindow());
+            alert.show();
+            return;
+        }
+
+        if (employee_masterList.stream().anyMatch(e -> {
+            return e.getManager().getEmp_id().equals(selectedEmployee.getEmp_id());
+        })) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Employee Delete Error");
+            alert.setHeaderText("Employee currently in Management");
+            alert.setContentText("Employee is a manager must be remove form the management first!");
+            alert.initOwner(scene.getWindow());
+            alert.show();
+            return;
+        }
+
+        employee_masterList.remove(selectedEmployee);
+        EmployeeDAO.delete(selectedEmployee);
+    }
+
+    @FXML
+    private void handleUpdate() {
+        if (newManagerField.getValue() == null) {
+            newManagerField.pseudoClassStateChanged(Styles.STATE_DANGER, true);
+            Animations.flash(filteredEmployeeField).playFromStart();
+            return;
+
+        }
+
+        Employee selectedEmployee = employeeTable.getSelectionModel().getSelectedItem();
+        if (selectedEmployee == null) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Employee Update Error");
+            alert.setHeaderText("Null selection Error!");
+            alert.setContentText("No employee selected from the table. Must select an employee to update");
+            alert.initOwner(scene.getWindow());
+            alert.show();
+            return;
+        }
+
+        selectedEmployee.setManager(newManagerField.getValue());
+        EmployeeDAO.update(selectedEmployee);
+
+
+    }
+
+    private Scene scene;
+
     @FXML
     private void handleAddEmployee() {
         if (nameField.getText().isEmpty()) {
@@ -77,15 +143,16 @@ public class RootController extends FXController {
             Animations.flash(filteredEmployeeField).playFromStart();
             return;
         }
+
+        employeeFilteredList.setPredicate(employee -> {
+            return employee.getEmp_id().trim().toUpperCase().equals(filteredEmployeeField.getText());
+        });
     }
 
     @FXML
     private void handleSearchAllEmployee() {
+        employeeFilteredList.setPredicate(p -> true);
     }
-
-    private ObservableList<Department> department_masterList;
-    private ObservableList<Employee> employee_masterList;
-    private FilteredList<Employee> managerList;
 
     private static class MANAGER_CELL extends ListCell<Employee> {
 
@@ -95,7 +162,7 @@ public class RootController extends FXController {
 
             if (item == null || empty) {
                 setText(null);
-                setGraphic(null);
+                setGraphic(new Label("SELECT MANAGER"));
                 return;
             }
             setGraphic(new Label(item.getName()));
@@ -104,20 +171,26 @@ public class RootController extends FXController {
     }
 
     @Override
-    protected void load_bindings() {
+    protected void load_fields() {
+
+        scene = (Scene) getParameter("SCENE");
         employee_masterList = App.COLLECTIONS_REGISTRY.getList("EMPLOYEE");
         department_masterList = App.COLLECTIONS_REGISTRY.getList("DEPARTMENT");
+        employeeFilteredList = new FilteredList<>(employee_masterList, p -> true);
 
         managerList = new FilteredList<>(employee_masterList, employeee -> {
-            return employeee.getJob() == Job.PRESIDENT || employeee.getJob() == Job.MANAGER;
+            return employeee.getJob() == Job.PRESIDENT || employeee.getJob() == Job.MANAGER
+                    || employeee.getJob() == Job.ANALYST;
         });
+
         managerField.setButtonCell(new MANAGER_CELL());
         managerField.setCellFactory(cell -> new MANAGER_CELL());
         managerField.setItems(managerList);
 
         newManagerField.setButtonCell(new MANAGER_CELL());
         newManagerField.setCellFactory(cell -> new MANAGER_CELL());
-        newManagerField.setItems(managerList);
+        newManagerField.getItems().add(null);
+        newManagerField.getItems().addAll(managerList);
 
         ObservableList<Job> joblList = FXCollections.observableArrayList(Job.values());
         if (employee_masterList.stream().anyMatch(e -> e.getJob().equals(Job.PRESIDENT))) {
@@ -156,11 +229,13 @@ public class RootController extends FXController {
         departmentColumn.setCellFactory(cell -> new Employee.DEPARTMENT_TABLECELL());
         departmentColumn.setCellValueFactory(cell -> cell.getValue().departmentProperty());
 
-        employeeTable.setItems(employee_masterList);
+        employeeTable.setItems(employeeFilteredList);
+
     }
 
     @Override
-    protected void load_fields() {
+    protected void load_bindings() {
+
     }
 
     @Override
@@ -177,6 +252,15 @@ public class RootController extends FXController {
         });
         filteredEmployeeField.textProperty().addListener((o, ov, nv) -> {
             filteredEmployeeField.pseudoClassStateChanged(Styles.STATE_DANGER, false);
+        });
+
+        newManagerField.valueProperty().addListener((o, ov, nv) -> {
+            newManagerField.pseudoClassStateChanged(Styles.STATE_DANGER, false);
+        });
+
+        employeeTable.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
+            newManagerField.setValue(nv.getManager());
+
         });
 
     }

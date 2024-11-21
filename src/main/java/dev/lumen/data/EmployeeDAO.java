@@ -97,4 +97,13 @@ public class EmployeeDAO {
         DB.insert(TABLE, paramList(employee));
 
     }
+
+    public static void delete(Employee employee) {
+        DB.select(TABLE, new DBParam(Types.VARCHAR, "emp_id", employee.getEmp_id()));
+    }
+
+    public static void update(Employee employee) {
+        DB.update(TABLE, new DBParam(Types.VARCHAR, "emp_id", employee.getEmp_id()),
+                new DBParam(Types.VARCHAR, "manager_id", employee.getManager().getEmp_id()));
+    }
 }
